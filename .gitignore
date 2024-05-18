@@ -21,3 +21,4 @@
 go.work
 .env
 local.settings.json
+api/api

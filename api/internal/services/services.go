@@ -8,8 +8,8 @@ type Services struct {
   SAS
 }
 
-func NewServices() *Services {
+func NewServices(connection string) *Services {
   return &Services{
-    SAS: NewSASService(),
+    SAS: NewSASService(connection),
   }
 }

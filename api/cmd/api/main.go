@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"os"
-  "context"
-  "os/signal"
-  "syscall"
+	"os/signal"
+	"syscall"
 
+	"github.com/joho/godotenv"
 	"github.com/redanthrax/as/api/internal/handlers"
 	"github.com/redanthrax/as/api/internal/services"
 	"github.com/redanthrax/as/api/server"
@@ -19,7 +20,9 @@ func main() {
     listenAddr = val
   }
 
-  serv := services.NewServices()
+  _ = godotenv.Load()
+  connection := os.Getenv("AzureWebJobsStorage")
+  serv := services.NewServices(connection)
   handler := handlers.NewHandler(serv)
   srv := new(server.Server)
   go func() {
