@@ -1,15 +1,20 @@
 package services
 
-type SAS interface {
-  GetSAS() (string, error)
+import (
+	"github.com/redanthrax/as/api/internal/repository"
+	"github.com/redanthrax/as/api/model"
+)
+
+type Pokemon interface {
+  GetPokemon() ([]model.Pokemon, error)
 }
 
 type Services struct {
-  SAS
+  Pokemon
 }
 
-func NewServices(connection string) *Services {
+func NewServices(repo *repository.Repository) *Services {
   return &Services{
-    SAS: NewSASService(connection),
+    Pokemon: NewPokemonService(repo),
   }
 }

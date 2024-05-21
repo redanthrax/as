@@ -5,3 +5,5 @@ tests:
 	go test ./...
 run:
 	go run cmd/api/main.go
+func:
+	func start --verbose

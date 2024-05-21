@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
-	"github.com/redanthrax/as/api/internal/services"
 	chi "github.com/go-chi/chi/v5"
+	"github.com/redanthrax/as/api/internal/services"
 )
 
 type Handler struct {
@@ -18,8 +19,8 @@ func NewHandler(services *services.Services) *Handler {
 func (h *Handler) InitRoutes() http.Handler {
   r := chi.NewRouter()
   r.Route("/api", func(r chi.Router) {
-    r.Route("/getsas", func(r chi.Router) {
-      r.Get("/", h.GetSAS)
+    r.Route("/pokemon", func(r chi.Router) {
+      r.Get("/", h.GetPokemon)
     })
   })
 
@@ -28,4 +29,11 @@ func (h *Handler) InitRoutes() http.Handler {
 
 func (h *Handler) HandleError(err error, w http.ResponseWriter) {
   http.Error(w, err.Error(), http.StatusInternalServerError)
+}
+
+func (h *Handler) HandleResponse(obj any, w http.ResponseWriter) {
+	if err := json.NewEncoder(w).Encode(obj); err != nil {
+    h.HandleError(err, w)
+    return
+	}
 }
