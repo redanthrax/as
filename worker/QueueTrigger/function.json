@@ -1,0 +1,10 @@
+{
+  "bindings": [
+    {
+      "name": "myQueueItem",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "pokemon"
+    }
+  ]
+}

@@ -3,9 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
-	chi "github.com/go-chi/chi/v5"
-	"github.com/redanthrax/as/api/internal/services"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/redanthrax/as/worker/internal/services"
 )
 
 type Handler struct {
@@ -18,14 +20,8 @@ func NewHandler(services *services.Services) *Handler {
 
 func (h *Handler) InitRoutes() http.Handler {
   r := chi.NewRouter()
-  r.Route("/api", func(r chi.Router) {
-    r.Route("/pokemon", func(r chi.Router) {
-      r.Get("/", h.GetPokemon)
-      r.Get("/sync", h.SyncPokemon)
-      r.Get("/queue", h.GetPokemonQueue)
-    })
-  })
-
+  r.Use(middleware.Timeout(30 * time.Second))
+  r.HandleFunc("/QueueTrigger", h.QueueTrigger)
   return r
 }
 

@@ -1,15 +1,13 @@
 package services
 
 import (
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azqueue"
-	"github.com/redanthrax/as/api/internal/repository"
-	"github.com/redanthrax/as/api/model"
+	"github.com/redanthrax/as/worker/internal/repository"
+	"github.com/redanthrax/as/worker/model"
 )
 
 type Pokemon interface {
   GetPokemon() ([]model.Pokemon, error)
-  SyncPokemon() error
-  GetPokemonQueue() (azqueue.PeekMessagesResponse, error)
+  FetchPokemon() error
 }
 
 type Services struct {

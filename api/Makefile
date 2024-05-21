@@ -6,4 +6,4 @@ tests:
 run:
 	go run cmd/api/main.go
 func:
-	func start --verbose
+	func start --verbose && GOARCH=amd64 GOOS=linux go build -o ${BINARY_NAME} cmd/api/main.go

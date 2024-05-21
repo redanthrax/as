@@ -6,10 +6,11 @@
   },
   "customHandler": {
     "description": {
-      "defaultExecutablePath": "api",
+      "defaultExecutablePath": "worker",
       "workingDirectory": "",
       "arguments": []
     },
     "enableForwardingHttpRequest": true
   },
+  "functionTimeout": "00:20:00"
 }

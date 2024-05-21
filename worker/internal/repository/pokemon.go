@@ -2,13 +2,11 @@ package repository
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/data/aztables"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azqueue"
-	"github.com/redanthrax/as/api/model"
-	"github.com/rs/zerolog/log"
+	"github.com/redanthrax/as/worker/model"
 )
 
 type PokemonAzStorage struct {
@@ -49,22 +47,4 @@ func (p *PokemonAzStorage) GetPokemon() ([]model.Pokemon, error) {
   }
 
   return pokemon, nil
-}
-
-func(p *PokemonAzStorage) SyncPokemon() error {
-  //storage queue requires a base64 encoded message
-  msg := base64.StdEncoding.EncodeToString([]byte("hello"))
-  resp, err := p.queue.EnqueueMessage(context.Background(), msg, nil)
-  log.Info().Any("resp", resp).Msg("")
-  if err != nil {
-    log.Error().Err(err).Msg("")
-    return err
-  }
-
-  return nil
-}
-
-func (p *PokemonAzStorage) GetPokemonQueue() (azqueue.PeekMessagesResponse, error) {
-  msgs, err := p.queue.PeekMessages(context.Background(), nil)
-  return msgs, err
 }
