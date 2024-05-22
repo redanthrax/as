@@ -7,7 +7,7 @@ import (
 
 type Pokemon interface {
   GetPokemon() ([]model.Pokemon, error)
-  FetchPokemon() error
+  SyncPokemon() error
 }
 
 type Services struct {

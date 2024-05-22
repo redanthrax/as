@@ -48,3 +48,30 @@ func (p *PokemonAzStorage) GetPokemon() ([]model.Pokemon, error) {
 
   return pokemon, nil
 }
+
+
+func (p *PokemonAzStorage) AddPokemon(pokemon model.Pokemon) error {
+  properties := map[string]interface{}{
+    "Name": pokemon.Name,
+  }
+
+  entity := aztables.EDMEntity {
+    Entity: aztables.Entity {
+      RowKey: pokemon.Name,
+      PartitionKey: "pokemon",
+    },
+    Properties: properties,
+  }
+
+  marshalled, err := json.Marshal(entity)
+  if err != nil {
+    return err
+  }
+
+  _, err = p.table.AddEntity(context.TODO(), marshalled, nil)
+  if err != nil {
+    return err
+  }
+
+  return nil
+}

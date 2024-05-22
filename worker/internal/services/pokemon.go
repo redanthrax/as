@@ -1,9 +1,7 @@
 package services
 
 import (
-	"time"
-
-	//"github.com/mtslzr/pokeapi-go"
+	"github.com/mtslzr/pokeapi-go"
 	"github.com/redanthrax/as/worker/internal/repository"
 	"github.com/redanthrax/as/worker/model"
 	"github.com/rs/zerolog/log"
@@ -22,11 +20,23 @@ func (s *PokemonService) GetPokemon() ([]model.Pokemon, error) {
   return poke, err
 }
 
-func (s *PokemonService) FetchPokemon() error {
+func (s *PokemonService) SyncPokemon() error {
   //sync up the db
-  //poke := pokeapi.Resource("pokemon")
-  log.Info().Msg("Fetching pokemon....")
-  time.Sleep(time.Second * 10) 
-  log.Info().Msg("Pokemon fetched.")
+  log.Info().Msg("Syncing pokemon....")
+  poke, err := pokeapi.Resource("pokemon", 0, 2000)
+  if err != nil {
+    return err
+  }
+  
+  for _, p := range poke.Results {
+    pm := model.Pokemon {
+      Name: p.Name,
+    }
+
+    log.Info().Str("pokemon", p.Name).Msg("adding pokemon")
+    s.repo.AddPokemon(pm)
+  }
+
+  log.Info().Msg("Pokemon sync complete")
   return nil
 }

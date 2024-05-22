@@ -8,6 +8,7 @@ import (
 
 type Pokemon interface {
   GetPokemon() ([]model.Pokemon, error)
+  AddPokemon(pokemon model.Pokemon) error
 }
 
 type Repository struct {
