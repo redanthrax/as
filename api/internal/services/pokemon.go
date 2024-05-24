@@ -16,17 +16,17 @@ func NewPokemonService(repo repository.Pokemon) *PokemonService {
 }
 
 func (s *PokemonService) GetPokemon() ([]model.Pokemon, error) {
-  poke, err := s.repo.GetPokemon()
+  poke, err := s.repo.GetPokemonT()
   return poke, err
 }
 
 func (s *PokemonService) SyncPokemon() error {
-  err := s.repo.SyncPokemon()
+  err := s.repo.SyncPokemonT()
   return err
 }
 
 func (s *PokemonService) GetPokemonQueue() (azqueue.PeekMessagesResponse, error) {
-  msgs, err := s.repo.GetPokemonQueue()
+  msgs, err := s.repo.GetPokemonQ()
   return msgs, err
 }
 

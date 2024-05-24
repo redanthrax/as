@@ -13,9 +13,10 @@ import (
 )
 
 type Pokemon interface {
-  GetPokemon() ([]model.Pokemon, error)
-  SyncPokemon() error
-  GetPokemonQueue() (azqueue.PeekMessagesResponse, error)
+  GetPokemonT() ([]model.Pokemon, error)
+  SyncPokemonT() error
+  GetPokemonQ() (azqueue.PeekMessagesResponse, error)
+  SyncPokemonQ() error
 }
 
 type Repository struct {
@@ -23,7 +24,10 @@ type Repository struct {
 }
 
 func NewRepository(db *aztables.ServiceClient, q *azqueue.ServiceClient) *Repository {
-  repo := &Repository{}
+  repo := &Repository{
+    Pokemon: nil,
+  }
+
   repo.Pokemon = NewPokemonAzStorage(repo, db, q)
   return repo
 }
