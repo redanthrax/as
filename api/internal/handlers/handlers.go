@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	chi "github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
 	"github.com/redanthrax/as/api/internal/services"
 )
 
@@ -26,6 +26,7 @@ func (h *Handler) InitRoutes() http.Handler {
     })
   })
 
+  r.HandleFunc("/QueueTrigger", h.QueueTrigger)
   return r
 }
 

@@ -2,26 +2,27 @@ package repository
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/data/aztables"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azqueue"
 	"github.com/redanthrax/as/api/model"
-	"github.com/rs/zerolog/log"
 )
 
 type PokemonAzStorage struct {
+  repo *Repository
   client *aztables.ServiceClient
   table *aztables.Client
   queue *azqueue.QueueClient
 }
 
-func NewPokemonAzStorage(db *aztables.ServiceClient, q *azqueue.ServiceClient) *PokemonAzStorage {
+func NewPokemonAzStorage(repo *Repository, db *aztables.ServiceClient, q *azqueue.ServiceClient) *PokemonAzStorage {
   //initialize and return
   db.CreateTable(context.Background(), "Pokemon", nil)
   q.CreateQueue(context.Background(), "pokemon", nil)
+
   return &PokemonAzStorage {
+    repo: repo,
     client: db,
     table: db.NewClient("Pokemon"),
     queue: q.NewQueueClient("pokemon"),
@@ -51,20 +52,43 @@ func (p *PokemonAzStorage) GetPokemon() ([]model.Pokemon, error) {
   return pokemon, nil
 }
 
-func(p *PokemonAzStorage) SyncPokemon() error {
-  //storage queue requires a base64 encoded message
-  msg := base64.StdEncoding.EncodeToString([]byte("hello"))
-  resp, err := p.queue.EnqueueMessage(context.Background(), msg, nil)
-  log.Info().Any("resp", resp).Msg("")
+func (p *PokemonAzStorage) AddPokemon(pokemon model.Pokemon) error {
+  properties := map[string]interface{}{
+    "Name": pokemon.Name,
+  }
+
+  entity := aztables.EDMEntity {
+    Entity: aztables.Entity {
+      RowKey: pokemon.Name,
+      PartitionKey: "pokemon",
+    },
+    Properties: properties,
+  }
+
+  marshalled, err := json.Marshal(entity)
   if err != nil {
-    log.Error().Err(err).Msg("")
+    return err
+  }
+
+  _, err = p.table.AddEntity(context.TODO(), marshalled, nil)
+  if err != nil {
     return err
   }
 
   return nil
 }
 
+func(p *PokemonAzStorage) SyncPokemon() error {
+  com := model.Command {
+    Function: "SyncPokemon",
+  }
+
+  err := p.repo.SendCommand(com, p.queue)
+  return err
+}
+
 func (p *PokemonAzStorage) GetPokemonQueue() (azqueue.PeekMessagesResponse, error) {
   msgs, err := p.queue.PeekMessages(context.Background(), nil)
   return msgs, err
 }
+

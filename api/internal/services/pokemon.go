@@ -1,6 +1,7 @@
 package services
 
 import (
+  "github.com/mtslzr/pokeapi-go"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azqueue"
 	"github.com/redanthrax/as/api/internal/repository"
 	"github.com/redanthrax/as/api/model"
@@ -27,4 +28,22 @@ func (s *PokemonService) SyncPokemon() error {
 func (s *PokemonService) GetPokemonQueue() (azqueue.PeekMessagesResponse, error) {
   msgs, err := s.repo.GetPokemonQueue()
   return msgs, err
+}
+
+func (s *PokemonService) PullPokemon() ([]model.Pokemon, error) {
+  poke, err := pokeapi.Resource("pokemon", 0, 2000)
+  if err != nil {
+    return nil, err
+  }
+ 
+  pokemon := make([]model.Pokemon, 0)
+  for _, p := range poke.Results {
+    pm := model.Pokemon {
+      Name: p.Name,
+    }
+
+    pokemon = append(pokemon, pm)
+  }
+
+  return pokemon, nil
 }
